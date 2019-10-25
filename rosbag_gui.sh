@@ -29,13 +29,13 @@ echo -e "\n ROSBAG finished recording"
 trap clean_up SIGHUP SIGINT SIGTERM
 
 function get_topics {
+	mapfile -t lines < <(rostopic list)
+	topics=( "${lines[@]/#/FALSE }" )
 
-mapfile -t  lines < <(rostopic list)
-topiclist=$(zenity --list --checklist --title="Select Topics for Recording" --column="select" --column="topic" ${lines[@]} 2>/dev/null) #map stderror to null because zenity produces useless GTK errors.
+	topiclist=$(zenity --list --checklist --title="Select topics to record" --column="select" --column="topic" ${topics[@]} 2> /dev/null)
 
-topiclist=${topiclist[@]}
-topiclist=${topiclist//[|]// }
-
+	topiclist=${topiclist[@]}
+	topiclist=${topiclist//[|]// }
 }
 
 function fileinfo {
